@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Politician Popularity Tracker</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: sans-serif; padding: 20px; background: #f4f4f9; }
+        .container { max-width: 1000px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        h1 { text-align: center; color: #333; }
+        canvas { margin-top: 20px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>📈 Wikipedia Trends: Politicians</h1>
+    <canvas id="myChart"></canvas>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, collection, getDocs, query, orderBy, limit } 
+        from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    // --- PASTE YOUR FIREBASE CONFIG BELOW THIS LINE ---
+    const firebaseConfig = {
+  apiKey: "AIzaSyCzue7zDEMHVrufC0hv8PmTxIuR9jjk0Eg",
+  authDomain: "public-vault.firebaseapp.com",
+  projectId: "public-vault",
+  storageBucket: "public-vault.firebasestorage.app",
+  messagingSenderId: "633422406962",
+  appId: "1:633422406962:web:dd5e86ec595d4d7665232b"
+    };
+    // --- END CONFIG ---
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    async function fetchData() {
+        console.log("Fetching data from Firestore...");
+        
+        // Get the last 2000 records (enough for a few politicians over a year)
+        // We sort by date so the chart flows correctly
+        const q = query(collection(db, "daily_stats"), orderBy("date", "asc"), limit(2000));
+        const querySnapshot = await getDocs(q);
+
+        const dataStore = {}; 
+        // Structure will be: { "Obama": { dates: [], views: [] }, "Trump": { dates: [], views: [] } }
+
+        querySnapshot.forEach((doc) => {
+            const data = doc.data();
+            const name = data.name;
+            
+            if (!dataStore[name]) {
+                dataStore[name] = { dates: [], views: [] };
+            }
+            
+            // Format date nicely (YYYYMMDD -> DD/MM)
+            const datePretty = `${data.date.substring(6,8)}/${data.date.substring(4,6)}`;
+            
+            dataStore[name].dates.push(datePretty);
+            dataStore[name].views.push(data.views);
+        });
+
+        renderChart(dataStore);
+    }
+
+    function renderChart(dataStore) {
+        const ctx = document.getElementById('myChart');
+        
+        // Convert our dataStore into Chart.js "Datasets"
+        const datasets = [];
+        let labels = []; // We'll grab dates from the first person as the master timeline
+
+        // Generate a random color for each person
+        const colors = ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'];
+        let colorIndex = 0;
+
+        for (const [name, info] of Object.entries(dataStore)) {
+            if (labels.length === 0) labels = info.dates; // Use first person's dates for X-axis
+            
+            datasets.push({
+                label: name.replace(/_/g, " "), // "Barack_Obama" -> "Barack Obama"
+                data: info.views,
+                borderColor: colors[colorIndex % colors.length],
+                tension: 0.3, // Makes lines curvy
+                fill: false
+            });
+            colorIndex++;
+        }
+
+        new Chart(ctx, {
+            type: 'line',
+            data: { labels: labels, datasets: datasets },
+            options: {
+                responsive: true,
+                interaction: { mode: 'index', intersect: false },
+                scales: {
+                   y: { beginAtZero: true }
+                }
+            }
+        });
+    }
+
+    fetchData();
+</script>
+
+</body>
+</html>
