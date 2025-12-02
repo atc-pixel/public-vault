@@ -1,0 +1,31 @@
+name: Daily Politician Tracker
+
+on:
+  schedule:
+    # Runs at 08:00 UTC every day
+    - cron: '0 8 * * *'
+  workflow_dispatch: # Allows you to click a button to run it manually for testing
+
+jobs:
+  update-data:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check out repository
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+
+    - name: Install dependencies
+      run: |
+        pip install requests firebase-admin
+
+    - name: Create Service Account File
+      # This takes the secret from GitHub settings and creates the file for the script to use
+      run: echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}' > serviceAccountKey.json
+
+    - name: Run Tracker Script
+      run: python tracker.py
