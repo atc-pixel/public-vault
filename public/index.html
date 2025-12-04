@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Daily Wiki Views — Percent Change Dashboard</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="firebase-config.js" defer></script>
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <main>
+      <header class="page-header">
+        <div>
+          <p class="eyebrow">Firebase Hosting</p>
+          <h1>Wikipedia Daily Views — Percent Change</h1>
+          <p class="lede">
+            Latest daily pageviews for the tracked politicians, plus the percentage
+            change compared to the previous day. Data is pulled by the Python tracker and stored in
+            Firestore.
+          </p>
+          <p class="note">
+            Add your Firebase client config to <code>public/firebase-config.js</code> (see the
+            <code>.example</code> file) before deploying.
+          </p>
+        </div>
+      </header>
+
+      <section class="card">
+        <div class="section-header">
+          <h2>Daily percent change</h2>
+          <p>Null values indicate the first recorded day or when the previous day is missing.</p>
+        </div>
+        <div class="chart-wrapper">
+          <canvas id="percentChangeChart" aria-label="Percent change chart" role="img"></canvas>
+        </div>
+        <div class="status-row">
+          <span id="loading" class="status"></span>
+          <span id="error" class="status error"></span>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="section-header">
+          <h2>Latest snapshot</h2>
+          <p>Most recent view totals and percent changes for each tracked article.</p>
+        </div>
+        <div id="latestList" class="latest-list"></div>
+      </section>
+    </main>
+  </body>
+</html>
