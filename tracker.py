@@ -9,7 +9,7 @@ from firebase_admin import credentials, firestore
 POLITICIANS = ["Barack_Obama", "Elon_Musk", "Donald_Trump", "Kamala_Harris"]
 START_DATE = "20240101"  # YYYYMMDD format
 END_DATE = datetime.now().strftime("%Y%m%d")
-WIKIMEDIA_CONTACT = os.environ.get("WIKIMEDIA_CONTACT", "your_email@example.com")
+WIKIMEDIA_CONTACT = os.environ.get("WIKIMEDIA_CONTACT", "caglayantalha@gmail.com")
 
 # 1. Initialize Firebase
 # Make sure your downloaded JSON key is in the same folder or set GOOGLE_APPLICATION_CREDENTIALS.
@@ -124,7 +124,7 @@ def upload_to_firestore(data):
 def main():
     print("🚀 Starting Time Machine...")
 
-    if WIKIMEDIA_CONTACT == "your_email@example.com":
+    if WIKIMEDIA_CONTACT == "caglayantalha@gmail.com":
         print(
             "⚠️  Set WIKIMEDIA_CONTACT to a real email or URL for Wikimedia API politeness."
         )
