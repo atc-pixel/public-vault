@@ -9,6 +9,7 @@ from firebase_admin import credentials, firestore
 POLITICIANS = ["Barack_Obama", "Elon_Musk", "Donald_Trump", "Kamala_Harris"]
 START_DATE = "20240101"  # YYYYMMDD format
 END_DATE = datetime.now().strftime("%Y%m%d")
+WIKIMEDIA_CONTACT = os.environ.get("WIKIMEDIA_CONTACT", "your_email@example.com")
 
 # 1. Initialize Firebase
 # Make sure your downloaded JSON key is in the same folder or set GOOGLE_APPLICATION_CREDENTIALS.
@@ -60,13 +61,18 @@ def fetch_history(article, start, end):
         f"en.wikipedia/all-access/user/{article}/daily/{start}/{end}"
     )
 
-    headers = {"User-Agent": "PoliticianTracker/1.0 (your_email@example.com)"}
-    response = requests.get(url, headers=headers)
+    headers = {"User-Agent": f"PoliticianTracker/1.0 ({WIKIMEDIA_CONTACT})"}
+
+    try:
+        response = requests.get(url, headers=headers, timeout=15)
+    except requests.RequestException as exc:  # noqa: PERF203 safe here for observability
+        print(f"Network error fetching {article}: {exc}")
+        return []
 
     if response.status_code == 200:
         return response.json().get("items", [])
 
-    print(f"Error fetching {article}: {response.status_code}")
+    print(f"Error fetching {article}: {response.status_code} {response.text}")
     return []
 
 
@@ -117,6 +123,11 @@ def upload_to_firestore(data):
 
 def main():
     print("🚀 Starting Time Machine...")
+
+    if WIKIMEDIA_CONTACT == "your_email@example.com":
+        print(
+            "⚠️  Set WIKIMEDIA_CONTACT to a real email or URL for Wikimedia API politeness."
+        )
 
     for person in POLITICIANS:
         print(f"Fetching history for: {person}...")
