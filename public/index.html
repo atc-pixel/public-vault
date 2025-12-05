@@ -1,55 +1,87 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Daily Wiki Views — Percent Change Dashboard</title>
+    <title>Public Attention Tracker</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- Styles -->
     <link rel="stylesheet" href="styles.css" />
-    <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore-compat.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="firebase-config.js" defer></script>
-    <script src="app.js" defer></script>
+
+    <!-- Chart.js (global Chart) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+    <!-- Firebase v8 (global firebase) -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
   </head>
   <body>
-    <main>
-      <header class="page-header">
+    <div class="page">
+      <header class="header">
         <div>
-          <p class="eyebrow">Firebase Hosting</p>
-          <h1>Wikipedia Daily Views — Percent Change</h1>
-          <p class="lede">
-            Latest daily pageviews for the tracked politicians, plus the percentage
-            change compared to the previous day. Data is pulled by the Python tracker and stored in
-            Firestore.
-          </p>
-          <p class="note">
-            Add your Firebase client config to <code>public/firebase-config.js</code> (see the
-            <code>.example</code> file) before deploying.
+          <h1>Public Attention Tracker</h1>
+          <p class="subtitle">
+            Wikipedia pageviews for selected public figures — daily percent change
+            and 7-day average views.
           </p>
         </div>
       </header>
 
-      <section class="card">
-        <div class="section-header">
-          <h2>Daily percent change</h2>
-          <p>Null values indicate the first recorded day or when the previous day is missing.</p>
-        </div>
-        <div class="chart-wrapper">
-          <canvas id="percentChangeChart" aria-label="Percent change chart" role="img"></canvas>
-        </div>
-        <div class="status-row">
-          <span id="loading" class="status"></span>
-          <span id="error" class="status error"></span>
-        </div>
-      </section>
+      <main class="main">
+        <!-- Status bar -->
+        <section class="status-bar">
+          <p id="loading" class="status loading"></p>
+          <p id="error" class="status error"></p>
+        </section>
 
-      <section class="card">
-        <div class="section-header">
-          <h2>Latest snapshot</h2>
-          <p>Most recent view totals and percent changes for each tracked article.</p>
-        </div>
-        <div id="latestList" class="latest-list"></div>
-      </section>
-    </main>
+        <!-- Charts -->
+        <section class="grid">
+          <article class="card card-chart">
+            <h2>Daily percent change vs previous day</h2>
+            <canvas id="percentChangeChart"></canvas>
+            <p class="chart-note">
+              Each line shows how much the daily views changed compared to the previous day.
+              Gaps indicate days where there is no prior data.
+            </p>
+          </article>
+
+          <article class="card card-chart">
+            <h2>7-day average daily views</h2>
+            <canvas id="viewsMAChart"></canvas>
+            <p class="chart-note">
+              7-day moving average of daily pageviews. This smooths out noise and highlights
+              longer-term trends in public attention.
+            </p>
+          </article>
+        </section>
+
+        <!-- Latest snapshot list -->
+        <section class="card card-latest">
+          <div class="card-header">
+            <h2>Latest snapshot</h2>
+            <p class="card-subtitle">
+              Most recent day of data for each person — total views and percent change vs
+              the previous day.
+            </p>
+          </div>
+
+          <div id="latestList" class="latest-list">
+            <!-- Filled by app.js / renderLatest -->
+          </div>
+        </section>
+      </main>
+
+      <footer class="footer">
+        <p>
+          Data from Wikimedia Pageviews API · Stored in Firestore · Visualized with Chart.js
+        </p>
+      </footer>
+    </div>
+
+    <!-- Your Firebase web config (must define global firebaseConfig) -->
+    <script src="firebase-config.js"></script>
+
+    <!-- App logic (uses firebaseConfig + firebase + Chart) -->
+    <script src="app.js"></script>
   </body>
 </html>
