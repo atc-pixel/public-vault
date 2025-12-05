@@ -45,26 +45,33 @@
     latestListEl.innerHTML = "";
 
     latestByName.forEach((entry, name) => {
+      // percent_change güvenli format
+      const percentValue =
+        typeof entry.percent_change === "number" ? entry.percent_change : null;
+
       const percent =
-        entry.percent_change === null || entry.percent_change === undefined
-          ? "—"
-          : `${entry.percent_change.toFixed(2)}%`;
+        percentValue === null ? "—" : `${percentValue.toFixed(2)}%`;
+
+      // views alanını güvenli al: sayı değilse 0 kabul et
+      const viewsValue =
+        typeof entry.views === "number" ? entry.views : 0;
 
       const card = document.createElement("div");
       card.className = "latest-item";
       card.innerHTML = `
-        <div>
-          <p class="label">${name.replace(/_/g, " ")}</p>
-          <p class="date">${formatDateLabel(entry.date)}</p>
-        </div>
-        <div class="metric">
-          <p class="views">${entry.views.toLocaleString()} views</p>
-          <p class="change">${percent} vs prev. day</p>
-        </div>
+          <div>
+            <p class="label">${name.replace(/_/g, " ")}</p>
+            <p class="date">${formatDateLabel(entry.date)}</p>
+          </div>
+          <div class="metric">
+            <p class="views">${viewsValue.toLocaleString()} views</p>
+            <p class="change">${percent} vs prev. day</p>
+          </div>
       `;
 
       latestListEl.appendChild(card);
     });
+
   }
 
   function renderChart(entries) {
