@@ -6,7 +6,7 @@ import requests
 from firebase_admin import credentials, firestore
 
 # --- CONFIGURATION ---
-POLITICIANS = ["Barack_Obama", "Elon_Musk", "Donald_Trump", "Kamala_Harris"]
+POLITICIANS = ["Recep_Tayyip_Erdoğan", "Özgür_Özel", "Devlet_Bahçeli", "Ekrem_İmamoğlu"]
 START_DATE = "20240101"  # YYYYMMDD format
 END_DATE = datetime.now().strftime("%Y%m%d")
 WIKIMEDIA_CONTACT = os.environ.get("WIKIMEDIA_CONTACT", "caglayantalha@gmail.com")
